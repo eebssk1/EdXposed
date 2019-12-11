@@ -35,3 +35,4 @@
 -keepclasseswithmember class * {
     native <methods>;
 }
+-optimizationpasses 2
