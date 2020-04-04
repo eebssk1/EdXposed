@@ -4,7 +4,7 @@ import org.gradle.internal.os.OperatingSystem
 apply plugin: 'com.android.library'
 
 // Values set here will be overriden by AppVeyor, feel free to modify during development.
-def buildVersionName = 'v0.4.6.3(4536.1)'
+def buildVersionName = 'v0.4.6.3(4536.2)'
 def buildVersionCode = 4536
 
 if (System.env.APPVEYOR_BUILD_VERSION != null) {
@@ -63,8 +63,8 @@ android {
         release {
             externalNativeBuild {
                 cmake {
-                    cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden -fuse-ld=gold -mtune=generic -Wl,--relax,-O2,-X,--icf=safe,--icf-iterations=4 -s -Wno-unused-value"
-                    cFlags "-fvisibility=hidden -fvisibility-inlines-hidden -fuse-ld=gold -mtune=generic -Wl,--relax,-O2,-X,--icf=safe,--icf-iterations=4 -s -Wno-unused-value"
+                    cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden -fuse-ld=gold -mtune=generic -Wl,--relax,-O2,-X,--icf=safe,--icf-iterations=1 -s -Wno-unused-value"
+                    cFlags "-fvisibility=hidden -fvisibility-inlines-hidden -fuse-ld=gold -mtune=generic -Wl,--relax,-O2,-X,--icf=safe,--icf-iterations=1 -s -Wno-unused-value"
                 }
             }
             minifyEnabled true
