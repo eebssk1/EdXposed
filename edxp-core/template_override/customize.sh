@@ -1,7 +1,29 @@
 SKIPUNZIP=1
 
+getRandomNameExist() {
+    RAND_PATH=$4
+    RAND_SUFFIX=$3
+    RAND_PREFIX=$2
+    RAND_DIGIT=$1
+    RAND_RAND="$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-"${RAND_DIGIT}")"
+    RAND_PATH_EXIST=false
+    for TARGET in ${RAND_PATH}; do
+        if [[ -e "${TARGET}/${RAND_PREFIX}${RAND_RAND}${RAND_SUFFIX}" ]]; then
+            RAND_PATH_EXIST=true
+        fi
+    done
+    if [[ "${RAND_PATH_EXIST}" == true ]]; then
+        getRandomNameExist "${RAND_DIGIT}" "${RAND_PREFIX}" "${RAND_SUFFIX}" "${RAND_PATH}"
+    else
+        echo "${RAND_RAND}"
+    fi
+}
+
 RIRU_PATH="/data/misc/riru"
-RIRU_EDXP="$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-4)"
+RIRU_EDXP="$(getRandomNameExist 4 "libriru_" ".so" "
+/system/lib
+/system/lib64
+")"
 RIRU_MODULES="${RIRU_PATH}/modules"
 RIRU_TARGET="${RIRU_MODULES}/${RIRU_EDXP}"
 
@@ -14,13 +36,27 @@ PROP_PRODUCT=$(getprop ro.build.product)
 PROP_BRAND=$(getprop ro.product.brand)
 PROP_MANUFACTURER=$(getprop ro.product.manufacturer)
 
-JAR_EDXP=$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-8)".jar"
-JAR_EDDALVIKDX=$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-8)".jar"
-JAR_EDDEXMAKER=$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-8)".jar"
-JAR_EDCONFIG=$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-8)".jar"
+JAR_EDXP="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+JAR_EDDALVIKDX="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+JAR_EDDEXMAKER="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+JAR_EDCONFIG="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
 LIB_RIRU_EDXP="libriru_${RIRU_EDXP}.so"
-LIB_WHALE_EDXP="lib$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-10).so"
-LIB_SANDHOOK_EDXP="lib$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-13).so"
+LIB_WHALE_EDXP="lib$(getRandomNameExist 10 "lib" ".so" "
+/system/lib
+/system/lib64
+").so"
+LIB_SANDHOOK_EDXP="lib$(getRandomNameExist 13 "lib" ".so" "
+/system/lib
+/system/lib64
+").so"
 
 MODEL="
 HD1900
@@ -45,6 +81,7 @@ HUAWEI
 OLD_MAGISK=false
 DETECTED_DEVICE=false
 #NO_PERSIST=false
+[[ "$(getenforce)" == "Enforcing" ]] && ENFORCE=true || ENFORCE=false
 
 abortC() {
   rm -rf "${MODPATH}"
@@ -232,9 +269,9 @@ fi
 
 if [[ ${BOOTMODE} == true && ${NO_MANAGER} == true ]]; then
     ui_print "- Installing stub apk"
-    cp -f "${MODPATH}/EdXposed.apk" /data/local/tmp/
-    pm install /data/local/tmp/EdXposed.apk 2>&2
-    rm -rf /data/local/tmp/EdXposed.apk
+    ${ENFORCE} && setenforce 0
+    (pm install "${MODPATH}/EdXposed.apk" >/dev/null 2>&2) || ui_print "  - Stub install failed! Do not forget install EdXposed Manager manually"
+    ${ENFORCE} && setenforce 1
 fi
 
 if [[ "${OLD_MAGISK}" == true ]]; then
