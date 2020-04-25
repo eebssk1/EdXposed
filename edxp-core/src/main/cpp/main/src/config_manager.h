@@ -16,7 +16,8 @@ namespace edxp {
     public:
 
         static ConfigManager *GetInstance() {
-            if (instance_ == 0) {
+            if (instance_ == nullptr) {
+                LOGI("ConfigManager::GetInstance(): instance_ == nullptr");
                 instance_ = new ConfigManager();
             }
             return instance_;
@@ -46,7 +47,7 @@ namespace edxp {
 
         std::string GetConfigPath(const std::string &suffix) const;
 
-        bool IsAppNeedHook(const std::string &app_data_dir);
+        bool IsAppNeedHook(const int userId, const std::string &app_data_dir, const std::string &nice_name);
 
         bool hidden_api_bypass_enabled_ = false;
     private:
