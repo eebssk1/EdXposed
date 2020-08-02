@@ -63,8 +63,8 @@ android {
         release {
             externalNativeBuild {
                 cmake {
-                    cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden -O2 -s -Wno-unused-value"
-                    cFlags "-fvisibility=hidden -fvisibility-inlines-hidden -O2 -s -Wno-unused-value"
+                    cppFlags "-fvisibility=hidden -fvisibility-inlines-hidden -Os -s -Wno-unused-value"
+                    cFlags "-fvisibility=hidden -fvisibility-inlines-hidden -Os -s -Wno-unused-value"
                 }
             }
             minifyEnabled true
