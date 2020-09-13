@@ -25,13 +25,13 @@ jobs:
       inputs:
         script: |
           echo platform  Init...
-          C:\Program Files (x86)\Android\android-sdk\tools\bin\sdkmanager.bat" "platforms;android-28" > nul
+          "C:\Program Files (x86)\Android\android-sdk\tools\bin\sdkmanager.bat" "platforms;android-28" > nul
       displayName: "Install deps"
     - task: CmdLine@2
       inputs:
         script: |
           echo platform tools Init...
-          C:\Program Files (x86)\Android\android-sdk\tools\bin\sdkmanager.bat" "build-tools;28.0.3" > nul
+          "C:\Program Files (x86)\Android\android-sdk\tools\bin\sdkmanager.bat" "build-tools;28.0.3" > nul
       displayName: "Install deps"
     - task: CmdLine@2
       inputs:
