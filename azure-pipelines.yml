@@ -1,0 +1,102 @@
+# Gradle
+# Build your Java project and run tests with Gradle using a Gradle wrapper script.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+ tags:
+   include:
+   - bd_ci_*
+
+pool:
+  vmImage: 'windows-latest'
+
+jobs:
+  - job: main
+    timeoutInMinutes: 50
+    steps:
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+         Write-Host "##vso[task.setvariable variable=ANDROID_NDK_HOME]C:\android-sdk-windows\ndk-bundle";
+         Write-Host "##vso[task.setvariable variable=ANDROID_NDK_PATH]C:\android-sdk-windows\ndk-bundle";
+         Write-Host "##vso[task.setvariable variable=ANDROID_HOME]C:\android-sdk-windows";
+         Write-Host "##vso[task.setvariable variable=PATH]${env:PATH};C:\android-sdk-windows\ndk-bundle;C:\android-sdk-windows\build-tools\28.0.3";
+      displayName: "Set Env"
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'inline'
+        script: |
+          from urllib.request import urlretrieve; urlretrieve('https://dl.google.com/android/repository/sdk-tools-windows-4333796.zip', 'sdk-tools-windows-4333796.zip')
+      displayName: "download sdk"
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: 'sdk-tools-windows-4333796.zip'
+        destinationFolder: 'C:\android-sdk-windows'
+        cleanDestinationFolder: true
+      displayName: "unzip sdk"
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo SDK Init...
+          yes | "C:\android-sdk-windows\tools\bin\sdkmanager.bat" --licenses > nul
+      displayName: "Install deps"
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo platform  Init...
+          "C:\android-sdk-windows\tools\bin\sdkmanager.bat" "platforms;android-28" > nul
+      displayName: "Install deps"
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo platform tools Init...
+          "C:\android-sdk-windows\tools\bin\sdkmanager.bat" "build-tools;28.0.3" > nul
+      displayName: "Install deps"
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Download Patcher..
+          "C:\android-sdk-windows\tools\bin\sdkmanager.bat" "patcher;v4" > nul
+      displayName: "Install deps"
+      condition: succeeded()
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Download CMake..
+          "C:\android-sdk-windows\tools\bin\sdkmanager.bat" "cmake;3.6.4111459" > nul
+      displayName: "Install deps"
+      condition: succeeded()
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Download Platform-Tools..
+          "C:\android-sdk-windows\tools\bin\sdkmanager.bat" "platform-tools" > nul
+      displayName: "Install deps"
+      condition: succeeded()
+    - task: CmdLine@2
+      inputs:
+        script: |
+          echo Download NDK..
+          "C:\android-sdk-windows\tools\bin\sdkmanager.bat" "ndk-bundle" > nul
+      displayName: "Install deps"
+      condition: succeeded()
+    - task: Gradle@2
+      inputs:
+        gradleWrapperFile: 'gradlew.bat'
+        tasks: ':edxp-core:zipYahfaRelease :edxp-core:zipSandhookRelease'
+        publishJUnitResults: false
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        gradleOptions: '-Xmx2048m'
+        sonarQubeRunAnalysis: false
+      displayName: "Build"
+      condition: succeeded()
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'edxp-core\release'
+        ArtifactName: 'release'
+        publishLocation: 'Container'
+      displayName: "Release"
+      condition: succeeded()
