@@ -1,7 +1,11 @@
 version: '0.4.6.4 ({build})'
 
 environment:
-  ANDROID_HOME: C:\android-sdk-windows
+  ANDROID_HOME: "C:\\android-sdk-windows"
+  ANDROID_NDK_HOME: "C:\\android-sdk-windows\\ndk-bundle"
+  JAVA_HOME: "C:\\Program Files\\Java\\jdk1.8.0"
+
+os: Visual Studio 2015
 
 install:
   - appveyor DownloadFile https://dl.google.com/android/repository/sdk-tools-windows-4333796.zip
@@ -13,7 +17,7 @@ install:
   - C:\android-sdk-windows\tools\bin\sdkmanager.bat "cmake;3.6.4111459" > nul
   - C:\android-sdk-windows\tools\bin\sdkmanager.bat "patcher;v4" > nul
   - C:\android-sdk-windows\tools\bin\sdkmanager.bat "ndk-bundle" > nul
-  - set PATH=%PATH%;C:\android-sdk-windows\ndk-bundle;C:\android-sdk-windows\build-tools\28.0.3
+  - set PATH=C:\android-sdk-windows\ndk-bundle;C:\android-sdk-windows\build-tools\28.0.3;%PATH%
 
 build_script:
   - gradlew.bat :edxp-core:zipYahfaRelease
