@@ -9,7 +9,7 @@ trigger:
    - bd_ci_*
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'vs2017-win2016'
 
 jobs:
   - job: main
@@ -22,7 +22,7 @@ jobs:
          Write-Host "##vso[task.setvariable variable=ANDROID_NDK_HOME]C:\android-sdk-windows\ndk-bundle";
          Write-Host "##vso[task.setvariable variable=ANDROID_NDK_PATH]C:\android-sdk-windows\ndk-bundle";
          Write-Host "##vso[task.setvariable variable=ANDROID_HOME]C:\android-sdk-windows";
-         Write-Host "##vso[task.setvariable variable=PATH]${env:PATH};C:\android-sdk-windows\ndk-bundle;C:\android-sdk-windows\build-tools\28.0.3";
+         Write-Host "##vso[task.setvariable variable=PATH]C:\android-sdk-windows\ndk-bundle;C:\android-sdk-windows\build-tools\28.0.3;${env:PATH}";
       displayName: "Set Env"
     - task: PythonScript@0
       inputs:
