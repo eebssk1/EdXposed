@@ -44,6 +44,15 @@ namespace art {
             }
         }
 
+        CREATE_HOOK_STUB_ENTRIES(bool, ShouldUseInterpreterEntrypoint, void *art_method, const void* quick_code) {
+            // TODO check hooked
+            bool hooked = false;
+            if (hooked && quick_code != nullptr) {
+                return false;
+            }
+            return ShouldUseInterpreterEntrypointBackup(art_method, quick_code);
+        }
+
     public:
         ClassLinker(void *thiz) : HookedObject(thiz) {}
 
@@ -51,6 +60,7 @@ namespace art {
             return instance_;
         }
 
+        // @ApiSensitive(Level.MIDDLE)
         static void Setup(void *handle, HookFunType hook_func) {
             HOOK_FUNC(Constructor, "_ZN3art11ClassLinkerC2EPNS_11InternTableE",
                       "_ZN3art11ClassLinkerC2EPNS_11InternTableEb"); // 10.0
@@ -59,6 +69,10 @@ namespace art {
 
             HOOK_FUNC(FixupStaticTrampolines,
                       "_ZN3art11ClassLinker22FixupStaticTrampolinesENS_6ObjPtrINS_6mirror5ClassEEE");
+            if (GetAndroidApiLevel() >= __ANDROID_API_R__) {
+                HOOK_FUNC(ShouldUseInterpreterEntrypoint,
+                          "_ZN3art11ClassLinker30ShouldUseInterpreterEntrypointEPNS_9ArtMethodEPKv");
+            }
         }
 
         ALWAYS_INLINE void SetEntryPointsToInterpreter(void *art_method) const {

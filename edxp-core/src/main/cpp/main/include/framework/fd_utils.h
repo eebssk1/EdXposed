@@ -19,7 +19,8 @@ namespace android {
 
         static void Setup(void *handle, HookFunType hook_func) {
             HOOK_FUNC(IsAllowed,
-                      "_ZNK23FileDescriptorWhitelist9IsAllowedERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE");
+                      "_ZNK23FileDescriptorWhitelist9IsAllowedERKNSt3__112"
+                      "basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE");
         }
 
     private:
